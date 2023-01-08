@@ -9,7 +9,6 @@ public class FollowCamera : MonoBehaviour
      private float limitCameraX = -10.13919f;
      private float cameraX;
 
-
     private void Update()
     {
         cameraX = player.position.x;

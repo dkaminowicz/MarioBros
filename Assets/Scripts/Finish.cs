@@ -6,15 +6,17 @@ using UnityEngine.SceneManagement;
 public class Finish : MonoBehaviour
 {
     [SerializeField] private AudioSource finishSoundEffect;
+    AudioSource[] allMyBackgroundAudioSources;
     private AudioSource backgroundSoundEffect;
+    private AudioSource backgroundRunningOutOfTimeSoundEffect;
 
-    private bool levelCompleted = false;
+    [HideInInspector] public bool levelCompleted = false;
 
     private void Start() {
-        backgroundSoundEffect = GameObject.Find("BG Music").GetComponent<AudioSource>();
+        allMyBackgroundAudioSources = GameObject.Find("BG Music").GetComponents<AudioSource>();
+        backgroundSoundEffect = allMyBackgroundAudioSources[0];
+        backgroundRunningOutOfTimeSoundEffect = allMyBackgroundAudioSources[1];
     }
-
-
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -22,6 +24,7 @@ public class Finish : MonoBehaviour
         {
             levelCompleted = true;
             backgroundSoundEffect.Pause();
+            backgroundRunningOutOfTimeSoundEffect.Pause();
             finishSoundEffect.Play();
             Invoke("CompleteLevel", 6f);
 

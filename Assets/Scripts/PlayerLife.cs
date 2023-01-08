@@ -7,7 +7,8 @@ using UnityEngine.UI;
 public class PlayerLife : MonoBehaviour
 {
 
-    [SerializeField] private int numberOflife = 3;
+    [SerializeField] private int numberOfLife = 3;
+
     [SerializeField] private Text lifeText;
     [SerializeField] private Text scoreText;
     [SerializeField] private Text timeText;
@@ -22,16 +23,19 @@ public class PlayerLife : MonoBehaviour
     [SerializeField] private float timeLeft = 120f;
     [SerializeField] private float warningTimeLeft = 30f;
 
-    [SerializeField] private float jumpForceWhenEnnemyDie = 4f;
-    private bool isDie = false;
 
-    private AudioSource backgroundSoundEffect;
-    [SerializeField] private AudioSource deathSoundEffect;
-    [SerializeField] private AudioSource killEnnemySoundEffect;
-    private AudioSource backgroundRunningOutOfTimeSoundEffect;
-    private bool isWarningSoundPlay = false;
+    [SerializeField] private float jumpForceWhenEnnemyDie = 4f;
+    private bool isDead = false;
 
     AudioSource[] allMyBackgroundAudioSources;
+    private AudioSource backgroundSoundEffect;
+    private AudioSource backgroundRunningOutOfTimeSoundEffect;
+    [SerializeField] private AudioSource deathSoundEffect;
+    [SerializeField] private AudioSource killEnnemySoundEffect;
+
+    private bool isWarningSoundPlay = false;
+
+    private bool levelCompleted;
 
     private void Start()
     {
@@ -44,15 +48,18 @@ public class PlayerLife : MonoBehaviour
 
     private void Update()
     {
-        timeLeft -= Time.deltaTime;
-
         if(timeLeft <= 0)
         {
             Die();
         }
         else
         {
-            timeText.text = (timeLeft).ToString("0");
+            levelCompleted = GameObject.Find("Castle").GetComponent<Finish>().levelCompleted;
+            if(!levelCompleted)
+            {
+                UpdateUITime();
+            }
+
             if(timeLeft <= warningTimeLeft && !isWarningSoundPlay)
             {
                 isWarningSoundPlay = true;
@@ -90,11 +97,12 @@ public class PlayerLife : MonoBehaviour
         }
     }
 
+
     private void Die()
     {
-        if(!isDie)
+        if(!isDead)
         {
-            isDie = true;
+            isDead = true;
             UpdateUILife();
             backgroundSoundEffect.Pause();
             backgroundRunningOutOfTimeSoundEffect.Pause();
@@ -102,13 +110,12 @@ public class PlayerLife : MonoBehaviour
             rb.bodyType = RigidbodyType2D.Static;
             anim.SetTrigger("death");
         }
-
     }
 
     private void RestartLevel()
     {
 
-        if(numberOflife > 0)
+        if(numberOfLife > 0)
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
@@ -121,14 +128,20 @@ public class PlayerLife : MonoBehaviour
 
     private void UpdateUILife()
     {
-        numberOflife--;
-        lifeText.text = "Lifes: " + numberOflife;
+        numberOfLife--;
+        lifeText.text = "Lifes: " + numberOfLife;
     }
 
     private void UpdateUIScore()
     {
         score += ennemyScore;
         scoreText.text = "Score:" + score;
+    }
+
+    private void UpdateUITime()
+    {
+        timeLeft -= Time.deltaTime;
+        timeText.text = "Time : " + (timeLeft).ToString("0");
     }
 
 }
